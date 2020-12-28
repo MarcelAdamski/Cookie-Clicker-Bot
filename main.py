@@ -5,12 +5,12 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.common.keys import Keys
 import time
-import pickle
 
 def TranslateNumbers(cookies, price):
     c = cookies.replace(',','')
     c = c.split(" ")
-    if len(c) == 1:
+    prefix = c[1]
+    if prefix[0] =="c":
         cookies = c[0]
     elif c[1] == "million":
         cookies = float(c[0]) * pow(10,6)
@@ -100,95 +100,127 @@ def TranslateNumbers(cookies, price):
         price = float(c[0]) * pow(10, 63)
     return cookies, price
 
-PATH = 'C:\Program Files (x86)\chromedriver.exe'
-cookies_location = r"C:\Users\Marcel\PycharmProjects\selenium_04_cookie_clicker\cookies.txt"
-driver = webdriver.Chrome(PATH)
+def SaveGame(driver):
+    try:
+        resetPosition = ActionChains(driver)
+        action = ActionChains(driver)
+        driver.find_element_by_xpath("//div[@id='prefsButton']").click()
+        time.sleep(2)
 
-driver.get("https://orteil.dashnet.org/cookieclicker/")
-print(driver.title)
+        body = driver.find_element_by_xpath('/html/body')
+        time.sleep(2)
 
-#driver.implicitly_wait(5)
-#loading
-WebDriverWait(driver, 10).until(
-        EC.presence_of_all_elements_located((By.XPATH, "/html")))
-time.sleep(4)
-driver.find_element_by_xpath('/html').send_keys(Keys.LEFT_CONTROL, 'O')
-time.sleep(2)
-with open('save.txt', 'r') as file:
-    save_text = file.read()
-    driver.find_element_by_xpath('//*[@id="textareaPrompt"]').send_keys(save_text)
-time.sleep(2)
-driver.find_element_by_xpath('//*[@id="promptOption0"]').click()
+        resetPosition.move_to_element_with_offset(body, 0, 0)
+        resetPosition.perform()
+        time.sleep(2)
 
-print('Game loaded !')
-time.sleep(2)
+        action.move_by_offset(484, 305).click()  # might need to change these numbers depending on your browser, but generally should work
+        action.perform()
+        time.sleep(2)
 
-#initalising variables
-product_prices=[]
-shop_or_upgrade = True
-big_cookie = driver.find_element_by_xpath("//div[@id='bigCookie']")
-number_of_cookies = driver.find_element_by_xpath("//div[@id='cookies']")
-#starting script. script is saving about every 60s (or so)
-for i in range(1, 5000):
-    for j in range(50):
-        big_cookie.click()
-    cookies = number_of_cookies.text.split(" ")[0]
-    print(cookies)
+        save_area_text = driver.find_element_by_xpath('//*[@id="textareaPrompt"]').text
+        with open('save.txt', 'w') as file:
+            file.write(save_area_text)
 
-    if i%10 == 0:
-        e = driver.find_element_by_xpath("//div[@class='product locked disabled toggledOff']").get_attribute('id')
-        product_prices.clear()
-        for index in range(int(e[-1]) - 1, -1, -1):
-            product_prices.append((index, driver.find_element_by_xpath("//span[@id='productPrice{}']".format(str(index)))))
-        if shop_or_upgrade:
-            for item in product_prices: #index of item in shop is on [0] and price is on [1]
-                print(item[0], item[1].text)
-                while True:
-                    cookies = number_of_cookies.text.split(" ")[0]
-                    cookies, price = TranslateNumbers(cookies, item[1].text)
-                    print(int(cookies), int(price))
-                    if int(cookies) >= int(price):
-                        product = driver.find_element_by_xpath("//div[@id='product{}']".format(str(item[0])))
-                        product.click()
-                        name = driver.find_element_by_xpath("//div[@id='productName{}']".format(str(item[0]))).text
-                        print(name,'has been bought!')
-                        time.sleep(0.3)
-                        continue
-                    break
-            shop_or_upgrade = False
-            print('testcommit')
-        else:
-            try:
-                e = driver.find_element_by_xpath("//div[@class='crate upgrade enabled']")
-                e.click()
-                print('Upgrade has been bought!')
-            except:
-                print('Upgrade not found or not enough funds!')
-            shop_or_upgrade = True
-    if i%100 == 0: #200 is every 1:55m #500 is every 5:40
-        try:
-            resetPosition = ActionChains(driver)
-            action = ActionChains(driver)
-            driver.find_element_by_xpath("//div[@id='prefsButton']").click()
-            time.sleep(2)
-            body = driver.find_element_by_xpath('/html/body')
-            time.sleep(2)
-            resetPosition.move_to_element_with_offset(body, 0, 0)
-            resetPosition.perform()
-            time.sleep(2)
-            action.move_by_offset(484,305).click()  # might need to change these numbers, just run once with the above uncommented to know what to put in.
-            action.perform()
-            time.sleep(2)
+        time.sleep(2)
+        driver.find_element_by_xpath('//*[@id="promptOption0"]').click()
+        print('Game saved+!')
+    except Exception as e:
+        print('Game save failed. Script is gonna try save again later.')
+    time.sleep(5)
+    driver.find_element_by_xpath('//div[@class="close menuClose"]').click()
 
-            save_area_text = driver.find_element_by_xpath('//*[@id="textareaPrompt"]').text
-            with open('save.txt', 'w') as file:
-                file.write(save_area_text)
+def LoadGame(driver):
+    WebDriverWait(driver, 10).until(EC.presence_of_all_elements_located((By.XPATH, "/html")))
+    time.sleep(4)
+    driver.find_element_by_xpath('/html').send_keys(Keys.LEFT_CONTROL, 'O')
+    time.sleep(2)
+    with open('save.txt', 'r') as file:
+        save_text = file.read()
+        driver.find_element_by_xpath('//*[@id="textareaPrompt"]').send_keys(save_text)
 
-            time.sleep(2)
-            driver.find_element_by_xpath('//*[@id="promptOption0"]').click()
-            print('Game saved+!')
-        except Exception as e:
-            print('Game save failed. Script is gonna try save again later.')
-        time.sleep(5)
-        driver.find_element_by_xpath('//div[@class="close menuClose"]').click()
-#driver.quit()
+    time.sleep(2)
+    driver.find_element_by_xpath('//*[@id="promptOption0"]').click()
+
+    print('Game loaded !')
+    time.sleep(2)
+
+def Shopping(driver, product_prices, number_of_cookies):
+    for item in product_prices:  # index of item in shop is on [0] and price is on [1]
+        print(item[0], item[1].text)
+        while True:
+            #print(number_of_cookies.text)
+            cookies, price = TranslateNumbers(number_of_cookies.text, item[1].text)
+            print(float(cookies), float(price))
+            if float(cookies) >= float(price):
+                product = driver.find_element_by_xpath("//div[@id='product{}']".format(str(item[0])))
+                product.click()
+                name = driver.find_element_by_xpath("//div[@id='productName{}']".format(str(item[0]))).text
+                print(name, 'has been bought!')
+                time.sleep(0.3)
+                continue
+            break
+
+def Upgrading(driver):
+    try:
+        e = driver.find_element_by_xpath("//div[@class='crate upgrade enabled']")
+        e.click()
+        print('Upgrade has been bought!')
+    except:
+        print('Not enough funds for upgrade!')
+
+def CheckShop(driver, product_prices):
+    e = driver.find_element_by_xpath("//div[@class='product locked disabled toggledOff']").get_attribute('id')
+    product_prices.clear()
+    for index in range(int(e[-1]) - 1, -1, -1):
+        product_prices.append((index, driver.find_element_by_xpath("//span[@id='productPrice{}']".format(str(index)))))
+
+def Game(loops, small_click_loop, shop, save):
+    PATH = 'C:\Program Files (x86)\chromedriver.exe'
+    driver = webdriver.Chrome(PATH)
+    driver.get("https://orteil.dashnet.org/cookieclicker/")
+    print(driver.title)
+
+    LoadGame(driver)
+    #Comment above line when you start new game.
+    #If you start new game you have to also clear save.txt file.
+    #If you want to load your own game, just paste your game save to "save.txt", save and run with uncommented line
+
+    product_prices = []
+    shop_or_upgrade = True
+    big_cookie = driver.find_element_by_xpath("//div[@id='bigCookie']")
+    number_of_cookies = driver.find_element_by_xpath("//div[@id='cookies']")
+
+    #Main loop of the game
+    for i in range(1, loops):
+        for j in range(small_click_loop):
+            big_cookie.click()
+        cookies = number_of_cookies.text
+        print(cookies)
+
+        if i % shop == 0:
+            CheckShop(driver, product_prices)
+            if shop_or_upgrade:
+                Shopping(driver, product_prices, number_of_cookies)
+                shop_or_upgrade = False
+            else:
+                Upgrading(driver)
+                shop_or_upgrade = True
+        if i % save == 0:  # 200 is every 1:55m #500 is every 5:40
+            SaveGame(driver)
+
+###STARTING PARAMETERS###
+#SMALL_CLICK_LOOP - determines how many clicks in one "small loop" default is 100 and I recommend leaving this option at 100
+#SHOP - #determines how many "small clicks" multiplied by this variable to perform, before trying to buy anything from shop or try to upgrade.
+#50 means shopping about every minute
+#SAVE - #determines how many "small clicks" multiplied by this variable to perform, before trying to save a game.
+#100 means about every 2min
+#LOOPS - one loop is
+#########################
+
+SMALL_CLICK_LOOP = 100
+SHOP = 25
+SAVE = 50
+LOOPS = 5000
+Game(LOOPS, SMALL_CLICK_LOOP, SHOP, SAVE)
+
