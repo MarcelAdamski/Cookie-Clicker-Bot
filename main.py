@@ -156,6 +156,7 @@ for i in range(1, 5000):
                         continue
                     break
             shop_or_upgrade = False
+            print('testcommit')
         else:
             try:
                 e = driver.find_element_by_xpath("//div[@class='crate upgrade enabled']")
