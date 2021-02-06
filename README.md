@@ -10,7 +10,7 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install Seleniu
 ```bash
 pip install selenium
 ```
-In PATH variable puth path to your ChromeDriver.exe. If you don't have ChromeDriver you can download it here: [ChromeDriver](https://chromedriver.chromium.org/downloads)
+In PATH variable put path to your ChromeDriver.exe. If you don't have ChromeDriver you can download it here: [ChromeDriver](https://chromedriver.chromium.org/downloads)
 
 ## Functionalities
 
