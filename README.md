@@ -25,8 +25,8 @@ In PATH variable put path to your ChromeDriver.exe. If you don't have ChromeDriv
 Please adjust parameters in code for you needs. 
 
 * SMALL_CLICK_LOOP - determines how many clicks in one "small loop" - default is 100 and I recommend leaving this option at 100
-* SHOP - #determines how many "small clicks" multiplied by this variable to perform, before trying to buy anything from shop or try to upgrade. For example 25 means shopping every ~40sec and 50 means shopping every ~1:15
-* SAVE - #determines how many "small clicks" multiplied by this variable to perform, before trying to save a game. For exmaple 50 means saving about every 1:20min and 100 means saving about every 2:30
+* SHOP - determines how many "small clicks" multiplied by this variable to perform, before trying to buy anything from shop or try to upgrade. For example 25 means shopping every ~40sec and 50 means shopping every ~1:15
+* SAVE - determines how many "small clicks" multiplied by this variable to perform, before trying to save a game. For exmaple 50 means saving about every 1:20min and 100 means saving about every 2:30
 * LOOPS - one loop is "SMALL_CLICK_LOOP" clicks on bigCookie, checks for shop and save.
 
 
