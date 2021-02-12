@@ -1,5 +1,5 @@
 # Cookie-Clicker-Bot
-Cookie Clicker Bot made using Python 3 with Selenium Framework. Made for educational purposes only.
+[Cookie Clicker](https://orteil.dashnet.org/cookieclicker/) Bot made using Python 3 with Selenium Framework. Made for educational purposes only.
 
 ## Installation
 
