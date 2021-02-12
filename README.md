@@ -22,7 +22,7 @@ In PATH variable put path to your ChromeDriver.exe. If you don't have ChromeDriv
 
 ## Starting parameters
 
-Please adjust parameters in code for you needs. 
+Please adjust parameters in code for your needs. 
 
 * SMALL_CLICK_LOOP - determines how many clicks in one "small loop" - default is 100 and I recommend leaving this option at 100
 * SHOP - determines how many "small clicks" multiplied by this variable to perform, before trying to buy anything from shop or try to upgrade. For example 25 means shopping every ~40sec and 50 means shopping every ~1:15
